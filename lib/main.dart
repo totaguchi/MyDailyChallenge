@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:my_daily_challenge/widget/timer_dialog.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,7 +30,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   CalendarController _calendarController;
-  final List<String> challenges = <String>['筋トレ', '読書'];
+  final List<String> challenges = <String>['Challenge1', 'Challenge2'];
 
   @override
   initState() {
@@ -41,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ホーム")
+        title: Text("Home")
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(6),
@@ -88,31 +89,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _myChanllenge(int index) {
     return Container(
-      child: Row(
-        children: <Widget>[
-        Expanded(
-          child: Container(
-            child: Text(challenges[index]),
+      child: Card(
+        margin: EdgeInsets.all(5),
+        color: Colors.lightBlue[50],
+        child: Row(
+          children: <Widget>[
+          Expanded(
+            child: Container(
+              child: Text(challenges[index]),
+            )
+          ),
+          Container(
+            padding: EdgeInsets.all(4),
+            child: RaisedButton(
+              child:Text("start"),
+              color:  Colors.lightBlue,
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => TimerDialog(challengeTime: 10),
+                );
+              }
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(4),
+            child: RaisedButton(
+              child:Text("delete"),
+              color: Colors.red,
+              onPressed: () {
+                openConfirmAlert(index);
+              },
+            ),
           )
+        ]
         ),
-        Container(
-          padding: EdgeInsets.all(4),
-          child: RaisedButton(
-            child:Text("start"),
-            color:  Colors.lightBlue,
-            onPressed: () {},
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(4),
-          child: RaisedButton(
-            child:Text("delete"),
-            color: Colors.red,
-            onPressed: () {},
-          ),
-        )
-      ]
       ),
     );
   }
+
+  //削除時の確認アラート
+  void openConfirmAlert(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Container(
+          child: AlertDialog(
+            title: Text("Challenge Give Up?"),
+            actions: <Widget>[
+              FlatButton(
+               child: Text("No"),
+               onPressed: () {
+                 Navigator.pop(context);
+               },
+              ),
+              FlatButton(
+                child: Text("Yes"),
+                onPressed: () {
+                  deleteChallenge(index);
+                },
+              ),
+            ],
+          ),
+        );      
+      }
+    );
+  }
+  
+  //チャレンジの削除
+  void deleteChallenge(int index) {
+    Navigator.pop(context);
+    setState(() {
+      challenges.removeAt(index);
+    });
+    print(index);
+    print(challenges);
+  }
+  
 }
