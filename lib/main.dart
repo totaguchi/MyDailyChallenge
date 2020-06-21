@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:my_daily_challenge/model/shared_pref.dart';
+import 'package:my_daily_challenge/widget/input_time_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:my_daily_challenge/widget/timer_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +35,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   CalendarController _calendarController;
   final List<String> challenges = <String>['Challenge1', 'Challenge2'];
+  SharedPref sharedPref = SharedPref();
+
+  //保存データの読み込み
+  // loadSharedPrefs() async {
+  //   try {
+  //   }
+  // }
 
   @override
   initState() {
@@ -42,7 +53,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home")
+        title: Text("Home"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add_circle_outline),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => InputTimeDialog(),
+              );
+            }
+          ),
+        ]
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(6),

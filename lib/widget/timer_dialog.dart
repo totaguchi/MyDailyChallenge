@@ -36,6 +36,7 @@ class _TimerDialogState extends State<TimerDialog> {
         FlatButton(
           child: Text("Close"),
           onPressed: () {
+            _timer.cancel();
             Navigator.pop(context);
           },
         ),

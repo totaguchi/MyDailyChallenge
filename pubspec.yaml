@@ -23,6 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  shared_preferences: ^0.5.7+3
+  flutter_time_picker_spinner: ^1.0.6+1
 
 
   # The following adds the Cupertino Icons font to your application.
