@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_daily_challenge/model/challenge.dart';
 import 'package:my_daily_challenge/model/shared_pref.dart';
 import 'package:my_daily_challenge/widget/input_time_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:my_daily_challenge/widget/timer_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,19 +33,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   CalendarController _calendarController;
-  final List<String> challenges = <String>['Challenge1', 'Challenge2'];
+  List<Challenge> challenges = [];
   SharedPref sharedPref = SharedPref();
 
-  //保存データの読み込み
-  // loadSharedPrefs() async {
-  //   try {
-  //   }
-  // }
+  loadSharedPrefs() async {
+    try {
+      List challengesJSON = await sharedPref.read("challenges");
+      challenges = challengesJSON.map((challenge) => Challenge.fromJson(challenge)).toList();
+      print("load");
+      print(challenges);
+    } catch (Exception) {
+    }
+  }
 
   @override
   initState() {
     super.initState();
     _calendarController = CalendarController();
+    this.loadSharedPrefs();
+    print("init");
   }
 
   @override
@@ -61,7 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
               showDialog(
                 context: context,
                 builder: (_) => InputTimeDialog(),
-              );
+              ).then((value) => setState(() {
+                this.loadSharedPrefs();
+              }));
             }
           ),
         ]
@@ -118,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
           Expanded(
             child: Container(
-              child: Text(challenges[index]),
+              child: Text(challenges[index].name),
             )
           ),
           Container(
@@ -129,7 +136,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (_) => TimerDialog(challengeTime: 10),
+                  builder: (_) => TimerDialog(
+                    challengeTime: challenges[index].time, 
+                    challengeName: challenges[index].name
+                  ),
                 );
               }
             ),
@@ -183,6 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pop(context);
     setState(() {
       challenges.removeAt(index);
+      sharedPref.save("challenges", challenges);
+      this.loadSharedPrefs();
     });
     print(index);
     print(challenges);

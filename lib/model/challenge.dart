@@ -1,6 +1,6 @@
 class Challenge {
   String name;
-  String time;
+  int time;
 
   Challenge();
 

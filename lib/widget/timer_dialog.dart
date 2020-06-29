@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 class TimerDialog extends StatefulWidget {
   final int challengeTime;
+  final String challengeName;
 
   const TimerDialog({
     Key key,
     this.challengeTime,
+    this.challengeName,
   }) : super(key: key);
 
   @override
@@ -17,18 +19,21 @@ class TimerDialog extends StatefulWidget {
 class _TimerDialogState extends State<TimerDialog> {
   Timer _timer;
   int time;
+  String name;
   bool isStart = true;
   
   @override
   void initState() {
     super.initState();
     time = widget.challengeTime;
+    name = widget.challengeName;
     countTime();
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      title: Text(name),
       content: Container(
         child: Text("$time"),
       ),
