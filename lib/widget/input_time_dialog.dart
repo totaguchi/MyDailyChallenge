@@ -86,26 +86,4 @@ class _InputTimeDialogState extends State<InputTimeDialog> {
     );
   }
 
-  // Widget timePicker() {
-  //   return new TimePickerSpinner(
-  //     is24HourMode: true,
-  //     isShowSeconds: true,
-  //     normalTextStyle: TextStyle(
-  //       fontSize: 20,
-  //       color: Colors.deepOrange
-  //     ),
-  //     highlightedTextStyle: TextStyle(
-  //       fontSize: 20,
-  //       color: Colors.yellow
-  //     ),
-  //     spacing: 30,
-  //     itemHeight: 50,
-  //     isForce2Digits: true,
-  //     onTimeChange: (item) {
-  //       print(item);
-  //       setState(() {
-  //       });
-  //     },
-  //   );
-  // }
 }

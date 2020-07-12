@@ -34,74 +34,63 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   CalendarController _calendarController;
   List<Challenge> challenges = [];
+  Map<DateTime, List> _achievementDays = Map();
   SharedPref sharedPref = SharedPref();
 
   loadSharedPrefs() async {
+    print("loadstart");
     try {
       List challengesJSON = await sharedPref.read("challenges");
-      challenges = challengesJSON.map((challenge) => Challenge.fromJson(challenge)).toList();
+      challenges = challengesJSON
+          .map((challenge) => Challenge.fromJson(challenge))
+          .toList();
       print("load");
-      print(challenges);
+      print(challenges.length);
+      challenges?.forEach((challenge) {
+        print(challenge.achievedThisMonthList.length);
+        challenge.achievedThisMonthList?.forEach((achievedDay) {
+          DateTime mapKeyDate = DateTime.parse(achievedDay.toString());
+          _achievementDays[mapKeyDate] = [];
+        });
+      });
+      setState(() {});
     } catch (Exception) {
+      print(Exception);
     }
   }
 
   @override
   initState() {
     super.initState();
-    _calendarController = CalendarController();
     this.loadSharedPrefs();
+    _calendarController = CalendarController();
     print("init");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Home"),
-        actions: <Widget>[
+        appBar: AppBar(title: Text("Home"), actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add_circle_outline),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => InputTimeDialog(),
-              ).then((value) => setState(() {
-                this.loadSharedPrefs();
-              }));
-            }
-          ),
-        ]
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(6),
-        itemCount: challenges.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return _buildTableCalendar();
-          }
-          return _myChanllenge(index - 1);
-        }
-      )
-      // body: SingleChildScrollView(
-      //   child: Column(
-      //     crossAxisAlignment: CrossAxisAlignment.start,
-      //     children: <Widget>[
-      //       _buildTableCalendar(),
-      //       SizedBox(height: 20,),
-      //       Container(
-      //         height: 300,
-      //         child: ListView.builder(
-      //           padding: EdgeInsets.all(6),
-      //           itemCount: challenges.length,
-      //           itemBuilder: (BuildContext context, int index) =>
-      //             _myChanllenge(index),
-      //         ),
-      //       ),             
-      //     ],
-      //   ),
-      // ),
-    );
+              icon: Icon(Icons.add_circle_outline),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => InputTimeDialog(),
+                ).then((value) => setState(() {
+                      this.loadSharedPrefs();
+                    }));
+              }),
+        ]),
+        body: ListView.builder(
+            padding: EdgeInsets.all(6),
+            itemCount: challenges.length + 1,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == 0) {
+                return _buildTableCalendar();
+              }
+              return _myChanllenge(index - 1);
+            }));
   }
 
   Widget _buildTableCalendar() {
@@ -109,9 +98,18 @@ class _HomeScreenState extends State<HomeScreen> {
       headerStyle: HeaderStyle(
         formatButtonShowsNext: false,
       ),
+      events: _achievementDays,
       builders: CalendarBuilders(
-        //todayDayBuilder: 
-      ),
+          //todayDayBuilder:
+          markersBuilder: (context, date, events, holidays) {
+        final children = <Widget>[];
+
+        children.add(Positioned(
+          bottom: 1,
+          child: _buildAchievementMaker(date, events),
+        ));
+        return children;
+      }),
       calendarController: _calendarController,
     );
   }
@@ -121,41 +119,50 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Card(
         margin: EdgeInsets.all(5),
         color: Colors.lightBlue[50],
-        child: Row(
-          children: <Widget>[
+        child: Row(children: <Widget>[
           Expanded(
-            child: Container(
-              child: Text(challenges[index].name),
-            )
+              child: Container(
+            child: Text(challenges[index].name),
+          )),
+          Container(
+            padding: EdgeInsets.all(4),
+            child: RaisedButton(
+                child: Text("start"),
+                color: Colors.lightBlue,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => TimerDialog(
+                        challengeTime: challenges[index].time,
+                        challengeName: challenges[index].name,
+                        challengeIndex: index),
+                  );
+                }),
           ),
           Container(
             padding: EdgeInsets.all(4),
             child: RaisedButton(
-              child:Text("start"),
-              color:  Colors.lightBlue,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => TimerDialog(
-                    challengeTime: challenges[index].time, 
-                    challengeName: challenges[index].name
-                  ),
-                );
-              }
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(4),
-            child: RaisedButton(
-              child:Text("delete"),
+              child: Text("delete"),
               color: Colors.red,
               onPressed: () {
                 openConfirmAlert(index);
               },
             ),
           )
-        ]
-        ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildAchievementMaker(DateTime date, List events) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration:
+          BoxDecoration(shape: BoxShape.circle, color: Colors.lightBlue),
+      width: 30,
+      height: 30,
+      child: Center(
+        child: Text('○'),
       ),
     );
   }
@@ -163,31 +170,30 @@ class _HomeScreenState extends State<HomeScreen> {
   //削除時の確認アラート
   void openConfirmAlert(int index) {
     showDialog(
-      context: context,
-      builder: (context) {
-        return Container(
-          child: AlertDialog(
-            title: Text("Challenge Give Up?"),
-            actions: <Widget>[
-              FlatButton(
-               child: Text("No"),
-               onPressed: () {
-                 Navigator.pop(context);
-               },
-              ),
-              FlatButton(
-                child: Text("Yes"),
-                onPressed: () {
-                  deleteChallenge(index);
-                },
-              ),
-            ],
-          ),
-        );      
-      }
-    );
+        context: context,
+        builder: (context) {
+          return Container(
+            child: AlertDialog(
+              title: Text("Challenge Give Up?"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("No"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  child: Text("Yes"),
+                  onPressed: () {
+                    deleteChallenge(index);
+                  },
+                ),
+              ],
+            ),
+          );
+        });
   }
-  
+
   //チャレンジの削除
   void deleteChallenge(int index) {
     Navigator.pop(context);
@@ -199,5 +205,4 @@ class _HomeScreenState extends State<HomeScreen> {
     print(index);
     print(challenges);
   }
-  
 }
