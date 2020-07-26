@@ -105,7 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
         final children = <Widget>[];
 
         children.add(Positioned(
-          bottom: 1,
+          right: 1,
+          bottom: 0,
           child: _buildAchievementMaker(date, events),
         ));
         return children;
@@ -158,11 +159,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration:
-          BoxDecoration(shape: BoxShape.circle, color: Colors.lightBlue),
-      width: 30,
-      height: 30,
+          BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+      width: 25,
+      height: 25,
       child: Center(
-        child: Text('○'),
+        child: Image(
+          image: AssetImage("assets/images/achieve.png"),
+        ),
       ),
     );
   }
@@ -204,5 +207,18 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     print(index);
     print(challenges);
+  }
+  
+  //翌月になると達成日リストを削除
+  void checkThisMonth() {
+    for ( DateTime day in _achievementDays.keys ) {
+      if (day.month != DateTime.now().month) {
+        challenges?.forEach((challenge) {
+          challenge.achievedThisMonthList = [];
+        });
+        sharedPref.save("challenges", challenges);
+        break;
+      }
+    }
   }
 }
