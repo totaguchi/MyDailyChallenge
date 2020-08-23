@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_daily_challenge/count_down_timer.dart';
 import 'package:my_daily_challenge/model/challenge.dart';
 import 'package:my_daily_challenge/model/shared_pref.dart';
 import 'package:my_daily_challenge/widget/input_time_dialog.dart';
@@ -20,6 +21,10 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomeScreen(),
+      routes: <String, WidgetBuilder> {
+        '/home':(BuildContext context) => new HomeScreen(),
+        '/timer':(BuildContext context) => new CountDownTimer(),
+      },
     );
   }
 }
@@ -130,15 +135,17 @@ class _HomeScreenState extends State<HomeScreen> {
             child: RaisedButton(
                 child: Text("start"),
                 color: Colors.lightBlue,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => TimerDialog(
-                        challengeTime: challenges[index].time,
-                        challengeName: challenges[index].name,
-                        challengeIndex: index),
-                  );
-                }),
+                onPressed: () => Navigator.of(context).pushNamed('/timer'),              
+                // showDialog(
+                  //   context: context,
+                  //   builder: (_) => TimerDialog(
+                  //       challengeTime: challenges[index].time,
+                  //       challengeName: challenges[index].name,
+                  //       challengeIndex: index),
+                  // );
+                  
+                //}),
+            ),
           ),
           Container(
             padding: EdgeInsets.all(4),
