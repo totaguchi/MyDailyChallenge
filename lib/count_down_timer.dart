@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:my_daily_challenge/custom_timer_painter.dart';
+import 'package:my_daily_challenge/model/challenge.dart';
+import 'package:my_daily_challenge/model/shared_pref.dart';
 
 class CountDownTimer extends StatefulWidget {
-  //CountDownTimer({Key key}) : super(key: key);
+  final int challengeTime;
+  final String challengeName;
+  final int challengeIndex;
+
+  CountDownTimer({
+    this.challengeTime,
+    this.challengeName,
+    this.challengeIndex,
+    Key key,
+  }) : super(key: key);
 
   @override
   _CountDownTimerState createState() => _CountDownTimerState();
@@ -11,26 +22,57 @@ class CountDownTimer extends StatefulWidget {
 class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStateMixin {
 
   AnimationController controller;
+  List<Challenge> challenges = [];
+  SharedPref sharedPref = SharedPref();
+  int time;
+  String name;
+  int index;
+  bool isChallengeClear = false;
 
   String get timerString {
     Duration duration = controller.duration * controller.value;
     return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
+  loadSharedPrefs() async {
+    try {
+      List challengesJSON = await sharedPref.read("challenges");
+      challenges = challengesJSON.map((challenge) => Challenge.fromJson(challenge)).toList();
+    } catch (Exception) {
+    }
+  }
+  saveResult() {
+    try {
+      isChallengeClear = true;
+      challenges[index].achievedThisMonthList.add(DateTime.now().toString());
+      sharedPref.save("challenges", challenges);
+    } catch (Exception) {
+
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    this.loadSharedPrefs();
+    time = widget.challengeTime;
+    name = widget.challengeName;
+    index = widget.challengeIndex;
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
-    );
+      duration: Duration(seconds: time),
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        this.saveResult();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: new Text('Timer'),
+        title: new Text(name),
       ),
       backgroundColor: Colors.white10,
       body: AnimatedBuilder(
@@ -69,7 +111,7 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  "Count Down Timer",
+                                  name,
                                   style: TextStyle(
                                     fontSize: 20.0,
                                     color: Colors.white,

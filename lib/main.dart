@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
       home: HomeScreen(),
       routes: <String, WidgetBuilder> {
         '/home':(BuildContext context) => new HomeScreen(),
-        '/timer':(BuildContext context) => new CountDownTimer(),
       },
     );
   }
@@ -135,7 +134,14 @@ class _HomeScreenState extends State<HomeScreen> {
             child: RaisedButton(
                 child: Text("start"),
                 color: Colors.lightBlue,
-                onPressed: () => Navigator.of(context).pushNamed('/timer'),              
+                onPressed: () => Navigator.push(
+                  this.context,
+                  MaterialPageRoute(
+                    builder: (context) => CountDownTimer(challengeTime: challenges[index].time, challengeName: challenges[index].name, challengeIndex: index) 
+                  )
+                ).then((value) => setState(() {
+                    this.loadSharedPrefs();
+                })),            
                 // showDialog(
                   //   context: context,
                   //   builder: (_) => TimerDialog(
