@@ -29,6 +29,11 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
   int index;
   bool isChallengeClear = false;
 
+  String get startTime {
+    Duration start = new Duration(seconds: time);
+    return '${start.inMinutes}:${(start.inSeconds % 60).toString().padLeft(2, '0')}';
+  }
+
   String get timerString {
     Duration duration = controller.duration * controller.value;
     return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
@@ -74,7 +79,7 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
       appBar: new AppBar(
         title: new Text(name),
       ),
-      backgroundColor: Colors.white10,
+      backgroundColor: Colors.white,
       body: AnimatedBuilder(
         animation: controller, 
         builder: (context, child) {
@@ -97,7 +102,7 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                                 return CustomPaint(
                                   painter: CustomTimerPainter(
                                     animation: controller,
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: Colors.black,
                                     color: Colors.lightBlue,
                                   ),
                                 );
@@ -111,20 +116,20 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  name,
+                                  isChallengeClear == false ? name : "Achieved！",
                                   style: TextStyle(
                                     fontSize: 20.0,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   ),
                                 ),
                                 AnimatedBuilder(
                                   animation:  controller,
                                   builder: (BuildContext context, Widget child) {
                                     return Text(
-                                      timerString,
+                                      controller.isAnimating == true ? timerString : startTime,
                                       style: TextStyle(
                                         fontSize: 112.0,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                       ),
                                     );
                                   },
