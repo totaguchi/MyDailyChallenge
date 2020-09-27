@@ -4,7 +4,6 @@ import 'package:my_daily_challenge/model/challenge.dart';
 import 'package:my_daily_challenge/model/shared_pref.dart';
 import 'package:my_daily_challenge/widget/input_time_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:my_daily_challenge/widget/timer_dialog.dart';
 
 void main() {
   runApp(MyApp());
@@ -126,8 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.lightBlue[50],
         child: Row(children: <Widget>[
           Expanded(
-              child: Container(
-            child: Text(challenges[index].name),
+            child: Container(
+              padding: EdgeInsets.only(left: 10, right: 5),
+              child: Text(challenges[index].name),
           )),
           Container(
             padding: EdgeInsets.all(4),
@@ -142,15 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ).then((value) => setState(() {
                     this.loadSharedPrefs();
                 })),            
-                // showDialog(
-                  //   context: context,
-                  //   builder: (_) => TimerDialog(
-                  //       challengeTime: challenges[index].time,
-                  //       challengeName: challenges[index].name,
-                  //       challengeIndex: index),
-                  // );
-                  
-                //}),
             ),
           ),
           Container(

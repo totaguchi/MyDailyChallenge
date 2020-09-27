@@ -28,6 +28,7 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
   String name;
   int index;
   bool isChallengeClear = false;
+  bool isStarted = false;
 
   String get startTime {
     Duration start = new Duration(seconds: time);
@@ -102,7 +103,7 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                                 return CustomPaint(
                                   painter: CustomTimerPainter(
                                     animation: controller,
-                                    backgroundColor: Colors.black,
+                                    backgroundColor: Colors.black38,
                                     color: Colors.lightBlue,
                                   ),
                                 );
@@ -118,18 +119,18 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                                 Text(
                                   isChallengeClear == false ? name : "Achieved！",
                                   style: TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.black,
+                                    fontSize: 25.0,
+                                    color: Colors.black45,
                                   ),
                                 ),
                                 AnimatedBuilder(
                                   animation:  controller,
                                   builder: (BuildContext context, Widget child) {
                                     return Text(
-                                      controller.isAnimating == true ? timerString : startTime,
+                                      isStarted ? timerString : startTime,
                                       style: TextStyle(
                                         fontSize: 112.0,
-                                        color: Colors.black,
+                                        color: Colors.black38,
                                       ),
                                     );
                                   },
@@ -146,13 +147,18 @@ class _CountDownTimerState extends State<CountDownTimer> with TickerProviderStat
                   builder: (context, child) {
                     return FloatingActionButton.extended(
                       onPressed: () {
+                        if (!isStarted) {
+                          isStarted = true;
+                        }
                         if (controller.isAnimating) {
                           controller.stop();
+                          setState(() {});
                         } else {
                           controller.reverse(
                             from: controller.value == 0.0
                                 ? 1.0
-                                : controller.value); 
+                                : controller.value);
+                          setState(() {});
                         }
                       },
                       icon: Icon(controller.isAnimating
